@@ -109,7 +109,7 @@ export function EmailCampaignPage() {
   const filtered = CAMPAIGNS.filter((c) => {
     const matchesSearch = c.name.toLowerCase().includes(search.toLowerCase());
     const matchesStatus =
-      statusFilter === 'all' || c.status.toLowerCase() === statusFilter;
+      !statusFilter || statusFilter === 'all' || c.status.toLowerCase() === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -119,8 +119,13 @@ export function EmailCampaignPage() {
       view: (
         <VStack align="stretch" spacing={6} pt={4}>
           {/* Filters */}
-          <Flex justify="space-between" align="center">
-            <Box w="339px">
+          <Flex
+            justify="space-between"
+            align={{ base: 'flex-start', md: 'center' }}
+            direction={{ base: 'column', md: 'row' }}
+            gap={3}
+          >
+            <Box w={{ base: 'full', md: '339px' }}>
               <SearchInput
                 placeholder="search by campaign name"
                 value={search}
@@ -129,7 +134,7 @@ export function EmailCampaignPage() {
                 }
               />
             </Box>
-            <HStack spacing={3}>
+            <HStack spacing={3} flexWrap="wrap">
               <Box w="118px">
                 <DropdownSingle
                   options={STATUS_FILTER_OPTIONS}
@@ -147,7 +152,7 @@ export function EmailCampaignPage() {
                 icon={Calendar}
                 iconPos="left"
                 size="md"
-                w="200px"
+                w={{ base: 'full', sm: '200px' }}
                 borderRadius="16px"
                 color="gray.500"
                 fontWeight="normal"
@@ -157,7 +162,7 @@ export function EmailCampaignPage() {
 
           {/* Table */}
           <Box overflowX="auto">
-            <Table variant="simple" size="md">
+            <Table variant="simple" size="md" minW="900px">
               <Thead>
                 <Tr borderBottom="1px solid" borderColor="gray.200">
                   <Th
@@ -166,6 +171,7 @@ export function EmailCampaignPage() {
                     color="#6F7489"
                     fontSize="14px"
                     textTransform="none"
+                    minW="200px"
                     w="260px"
                   >
                     Name
@@ -176,6 +182,7 @@ export function EmailCampaignPage() {
                     color="#6F7489"
                     fontSize="14px"
                     textTransform="none"
+                    minW="120px"
                     w="246px"
                   >
                     Recipients
@@ -186,6 +193,7 @@ export function EmailCampaignPage() {
                     color="#6F7489"
                     fontSize="14px"
                     textTransform="none"
+                    minW="160px"
                     w="220px"
                   >
                     Created By
@@ -196,6 +204,7 @@ export function EmailCampaignPage() {
                     color="#6F7489"
                     fontSize="14px"
                     textTransform="none"
+                    minW="120px"
                     w="164px"
                   >
                     Start Date
@@ -206,6 +215,7 @@ export function EmailCampaignPage() {
                     color="#6F7489"
                     fontSize="14px"
                     textTransform="none"
+                    minW="120px"
                     w="205px"
                   >
                     Status
@@ -216,6 +226,7 @@ export function EmailCampaignPage() {
                     color="#6F7489"
                     fontSize="14px"
                     textTransform="none"
+                    minW="60px"
                     w="82px"
                   >
                     Stats
@@ -226,6 +237,7 @@ export function EmailCampaignPage() {
                     color="#6F7489"
                     fontSize="14px"
                     textTransform="none"
+                    minW="120px"
                     w="137px"
                   >
                     Reports
@@ -260,7 +272,7 @@ export function EmailCampaignPage() {
                     </Td>
                     <Td py="20.5px">
                       <IconButton
-                        icon={Info}
+                        icon={<Info />}
                         variant="minimal"
                         aria-label="Stats"
                         size="sm"
@@ -278,7 +290,7 @@ export function EmailCampaignPage() {
                           h="auto"
                         />
                         <IconButton
-                          icon={Download}
+                          icon={<Download />}
                           variant="minimal"
                           aria-label="Download"
                           size="sm"
@@ -292,7 +304,7 @@ export function EmailCampaignPage() {
           </Box>
 
           {/* Pagination */}
-          <Box px={6} pb={4}>
+          <Box px={{ base: 0, md: 6 }} pb={4}>
             <Pagination
               totalItems={filtered.length}
               currentPageNumber={1}
@@ -331,16 +343,17 @@ export function EmailCampaignPage() {
         align="center"
         bg="#292158"
         w="74px"
-        minH="900px"
+        minH="100vh"
         py={5}
         gap={4}
         flexShrink={0}
         overflowY="auto"
+        display={{ base: 'none', lg: 'flex' }}
       >
-        {NAV_ICONS.map(({ icon, label }) => (
+        {NAV_ICONS.map(({ icon: NavIcon, label }) => (
           <IconButton
             key={label}
-            icon={icon}
+            icon={<NavIcon />}
             variant="action-dark"
             aria-label={label}
             size="md"
@@ -355,8 +368,8 @@ export function EmailCampaignPage() {
           as="header"
           align="center"
           justify="space-between"
-          h="48px"
-          px={6}
+          minH="48px"
+          px={{ base: 3, md: 6 }}
           bg="white"
           borderBottom="1px solid"
           borderColor="#DDDFE4"
@@ -365,15 +378,15 @@ export function EmailCampaignPage() {
           <Text color="#11304F" fontSize="14px">
             Campaign
           </Text>
-          <HStack spacing={4}>
+          <HStack spacing={{ base: 2, md: 4 }}>
             <IconButton
-              icon={Notification}
+              icon={<Notification />}
               variant="minimal"
               aria-label="Notifications"
               size="sm"
             />
             <IconButton
-              icon={Settings}
+              icon={<Settings />}
               variant="minimal"
               aria-label="Settings"
               size="sm"
@@ -389,6 +402,7 @@ export function EmailCampaignPage() {
               bg="#F4F6F8"
               border="none"
               _hover={{ bg: '#E8EBF0' }}
+              display={{ base: 'none', sm: 'flex' }}
             />
             <Avatar
               id="current-user"
@@ -402,9 +416,16 @@ export function EmailCampaignPage() {
 
         {/* Page Body */}
         <Box flex={1} overflowY="auto" bg="white">
-          <Box px={6} pt={6}>
+          <Box pt={6}>
             {/* Page Header */}
-            <Flex justify="space-between" align="center" mb={6}>
+            <Flex
+              px={{ base: 3, md: 6 }}
+              justify="space-between"
+              align={{ base: 'flex-start', sm: 'center' }}
+              direction={{ base: 'column', sm: 'row' }}
+              gap={{ base: 3, sm: 0 }}
+              mb={6}
+            >
               <Text
                 fontSize="24px"
                 fontWeight="bold"
@@ -412,7 +433,7 @@ export function EmailCampaignPage() {
               >
                 Email
               </Text>
-              <HStack spacing={3}>
+              <HStack spacing={3} flexWrap="wrap">
                 <Button
                   label="Export"
                   variant="secondary"
@@ -446,6 +467,7 @@ export function EmailCampaignPage() {
               data={tabData}
               selectedTabIndex={tabIndex}
               onChangeTabIndex={setTabIndex}
+              children={null}
             />
           </Box>
         </Box>

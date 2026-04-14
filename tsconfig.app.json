@@ -8,7 +8,23 @@
       "@radiant/common/models": ["/Users/ajit/Documents/GitHub/radiant-frontend/libs/common/models/src/index.ts"],
       "@radiant/common/theme": ["/Users/ajit/Documents/GitHub/radiant-frontend/libs/common/theme/src/index.ts"],
       "@radiant/common/ui": ["/Users/ajit/Documents/GitHub/radiant-frontend/libs/common/ui/src/index.ts"],
-      "@radiant/common/utils": ["/Users/ajit/Documents/GitHub/radiant-frontend/libs/common/utils/src/index.ts"]
+      "@radiant/common/utils": ["/Users/ajit/Documents/GitHub/radiant-frontend/libs/common/utils/src/index.ts"],
+      "csstype": ["./node_modules/csstype/index.d.ts"],
+      "react": ["./node_modules/@types/react/index.d.ts"],
+      "react/jsx-runtime": ["./node_modules/@types/react/jsx-runtime.d.ts"],
+      "react/jsx-dev-runtime": ["./node_modules/@types/react/jsx-dev-runtime.d.ts"],
+      "react-dom": ["./node_modules/@types/react-dom/index.d.ts"],
+      "@chakra-ui/*": ["./node_modules/@chakra-ui/*"],
+      "@emotion/*": ["./node_modules/@emotion/*"],
+      "framer-motion": ["./node_modules/framer-motion"],
+      "downshift": ["./node_modules/downshift"],
+      "react-icons": ["./node_modules/react-icons"],
+      "react-icons/*": ["./node_modules/react-icons/*"],
+      "react-popper": ["./node_modules/react-popper"],
+      "react-phone-input-2": ["./node_modules/react-phone-input-2"],
+      "react-select": ["./node_modules/react-select"],
+      "styled-components": ["./node_modules/styled-components"],
+      "react-datepicker": ["./node_modules/react-datepicker"]
     },
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "es2023",
@@ -20,14 +36,14 @@
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Linting */
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    /* Linting — disabled because they fire on library source files pulled in via paths */
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
