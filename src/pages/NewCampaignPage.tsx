@@ -18,23 +18,58 @@ import {
   Button,
   IconButton,
   SearchInput,
-  Stepper,
   Menu,
   MenuItem,
-  Avatar,
   ArrowBack,
-  ChevronRight,
   Plus,
   Download,
   ImportXlsx,
   Info,
   More,
   Attention,
-  SMSCampaign,
   Users,
+  Dashboard,
+  Chat,
+  Email,
+  Customers,
+  Settings,
+  Analytics,
+  SMSCampaign,
+  Schedule,
+  Responses,
+  Projects,
+  Filter,
+  ReputationManagment,
 } from '@radiant/common/ui';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Nav icons (same as EmailCampaignPage) ────────────────────────────────────
+
+const NAV_ICONS = [
+  { icon: Dashboard, label: 'Dashboard' },
+  { icon: Chat, label: 'Chat' },
+  { icon: Analytics, label: 'AI' },
+  { icon: Filter, label: 'Filter' },
+  { icon: Projects, label: 'Projects' },
+  { icon: Email, label: 'Email' },
+  { icon: Customers, label: 'Customers' },
+  { icon: SMSCampaign, label: 'Campaign' },
+  { icon: Responses, label: 'Responses' },
+  { icon: Schedule, label: 'Schedule' },
+  { icon: ReputationManagment, label: 'Reputation' },
+  { icon: Analytics, label: 'Analytics' },
+  { icon: Settings, label: 'Settings' },
+];
+
+// ─── Stepper steps ────────────────────────────────────────────────────────────
+
+const STEPS = [
+  'Select recipient',
+  'Compose your message',
+  'Schedule',
+  'Review & send',
+];
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type Recipient = {
   id: number;
@@ -44,15 +79,6 @@ type Recipient = {
   balance: string;
   language: string;
 };
-
-// ─── Constants ───────────────────────────────────────────────────────────────
-
-const STEPS = [
-  'Select Recipient',
-  'Compose Your Message',
-  'Define your Send Options',
-  'Review and Send',
-];
 
 const MOCK_RECIPIENTS: Recipient[] = [
   {
@@ -65,7 +91,80 @@ const MOCK_RECIPIENTS: Recipient[] = [
   },
 ];
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// ─── Custom Stepper ───────────────────────────────────────────────────────────
+
+function CampaignStepper({
+  steps,
+  currentStep,
+}: {
+  steps: string[];
+  currentStep: number;
+}) {
+  return (
+    <Box>
+      {steps.map((label, i) => {
+        const isActive = i === currentStep;
+        const isCompleted = i < currentStep;
+        const isLast = i === steps.length - 1;
+
+        const circleBg = isActive || isCompleted ? '#11304F' : '#E6E8EB';
+        const circleColor = isActive || isCompleted ? 'white' : '#6F7489';
+        const labelColor = isActive ? '#11304F' : '#6F7489';
+
+        return (
+          <Box key={label}>
+            {/* Step row */}
+            <Flex align="center" gap="16px">
+              {/* Number circle */}
+              <Flex
+                align="center"
+                justify="center"
+                borderRadius="full"
+                bg={circleBg}
+                w="32px"
+                h="32px"
+                flexShrink={0}
+              >
+                <Text
+                  fontSize="14px"
+                  fontWeight="bold"
+                  color={circleColor}
+                  lineHeight="24px"
+                >
+                  {i + 1}
+                </Text>
+              </Flex>
+
+              {/* Label */}
+              <Text
+                fontSize="14px"
+                fontWeight="medium"
+                color={labelColor}
+                whiteSpace="nowrap"
+              >
+                {label}
+              </Text>
+            </Flex>
+
+            {/* Connector line */}
+            {!isLast && (
+              <Box w="32px" h="18px" overflow="hidden">
+                <Box
+                  ml="15px"
+                  w="1px"
+                  h="32px"
+                  bg="#DDDFE4"
+                />
+              </Box>
+            )}
+          </Box>
+        );
+      })}
+    </Box>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function NewCampaignPage() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -76,130 +175,113 @@ export function NewCampaignPage() {
   );
 
   const handleNext = () => {
-    if (currentStep < STEPS.length - 1) {
-      setCurrentStep((s) => s + 1);
-    }
+    if (currentStep < STEPS.length - 1) setCurrentStep((s) => s + 1);
   };
 
   return (
-    <Flex direction="column" h="100vh" bg="white" overflow="hidden">
-      {/* ── Top bar (breadcrumb row) ── */}
+    <Flex h="100vh" overflow="hidden">
+      {/* ── Left Sidebar Nav (same as campaign list) ── */}
       <Flex
+        as="nav"
+        direction="column"
         align="center"
-        justify="space-between"
-        px={6}
-        h="48px"
-        bg="white"
-        borderBottom="1px solid"
-        borderColor="#DDDFE4"
+        bg="#292158"
+        w="74px"
+        py={5}
+        gap={4}
         flexShrink={0}
+        overflowY="auto"
       >
-        <Text color="#11304F" fontSize="14px">
-          Campaigns
-        </Text>
-        <Avatar id="top-user" name="Admin User" size="sm" />
+        {NAV_ICONS.map(({ icon, label }) => (
+          <IconButton
+            key={label}
+            icon={icon}
+            variant="action-dark"
+            aria-label={label}
+            size="md"
+          />
+        ))}
       </Flex>
 
-      {/* ── Header (icon + breadcrumb + Next button) ── */}
-      <Flex
-        align="center"
-        justify="space-between"
-        px={6}
-        h="64px"
-        bg="white"
-        borderBottom="1px solid"
-        borderColor="#DDDFE4"
-        flexShrink={0}
-      >
-        {/* Left: back icon + campaign icon + breadcrumb */}
-        <HStack spacing={3}>
-          <Link to="/" style={{ textDecoration: 'none' }}>
-            <IconButton
-              icon={ArrowBack}
-              variant="minimal"
-              aria-label="Go back"
-              size="sm"
-            />
-          </Link>
-          <Icon as={SMSCampaign} fontSize="22px" color="#11304F" />
-          <Text fontWeight="bold" fontSize="18px" color="#11304F">
-            Campaigns
-          </Text>
+      {/* ── Main Area ── */}
+      <Flex direction="column" flex={1} overflow="hidden">
 
-          {/* Breadcrumb */}
-          <HStack spacing={2}>
-            <Icon as={ChevronRight} fontSize="16px" color="#6F7489" />
+        {/* ── Top Header: back + title + Next ── */}
+        <Flex
+          align="center"
+          justify="space-between"
+          px={6}
+          h="64px"
+          bg="white"
+          borderBottom="1px solid"
+          borderColor="#DDDFE4"
+          flexShrink={0}
+        >
+          <HStack spacing={3}>
             <Link to="/" style={{ textDecoration: 'none' }}>
-              <Text
-                fontSize="14px"
-                color="#6F7489"
-                cursor="pointer"
-                _hover={{ color: '#11304F' }}
-              >
-                Index
-              </Text>
+              <IconButton
+                icon={ArrowBack}
+                variant="minimal"
+                aria-label="Go back"
+                size="sm"
+              />
             </Link>
-            <Icon as={ChevronRight} fontSize="16px" color="#6F7489" />
-            <Text fontSize="14px" color="#11304F" fontWeight="medium">
-              New Campaign
-            </Text>
-            <Icon as={ChevronRight} fontSize="16px" color="#6F7489" />
-            <Text fontSize="14px" color="#6F7489">
-              {STEPS[currentStep]}
+            <Text fontWeight="bold" fontSize="18px" color="#11304F">
+              Create New Campaign
             </Text>
           </HStack>
-        </HStack>
 
-        {/* Right: Next button */}
-        <Button
-          label="Next"
-          variant="primary"
-          size="md"
-          borderRadius="16px"
-          bg="#48B5B5"
-          _hover={{ bg: '#3DA3A3' }}
-          color="white"
-          minW="100px"
-          onClick={handleNext}
-          disabled={currentStep === STEPS.length - 1}
-        />
-      </Flex>
-
-      {/* ── Body (stepper sidebar + content) ── */}
-      <Flex flex={1} overflow="hidden">
-        {/* Stepper sidebar */}
-        <Box
-          w="160px"
-          flexShrink={0}
-          borderRight="1px solid"
-          borderColor="#DDDFE4"
-          pt={8}
-          px={4}
-          bg="white"
-          overflowY="auto"
-        >
-          <Stepper
-            stepTitleList={STEPS}
-            currentStepIndex={currentStep}
-            type="default"
-            allowOfsset
-            onChange={setCurrentStep}
+          <Button
+            label="Next"
+            variant="primary"
+            size="md"
+            borderRadius="16px"
+            bg="#48B5B5"
+            _hover={{ bg: '#3DA3A3' }}
+            color="white"
+            minW="100px"
+            onClick={handleNext}
+            disabled={currentStep === STEPS.length - 1}
           />
-        </Box>
+        </Flex>
 
-        {/* Main content */}
-        <Box flex={1} overflowY="auto" px={8} pt={8} bg="white">
-          {currentStep === 0 && (
-            <SelectRecipientsStep
-              search={search}
-              onSearch={setSearch}
-              recipients={filtered}
-            />
-          )}
-          {currentStep === 1 && <StepPlaceholder title="Compose Your Message" />}
-          {currentStep === 2 && <StepPlaceholder title="Define your Send Options" />}
-          {currentStep === 3 && <StepPlaceholder title="Review and Send" />}
-        </Box>
+        {/* ── Body: stepper sidebar + content ── */}
+        <Flex flex={1} overflow="hidden">
+
+          {/* Custom stepper sidebar */}
+          <Box
+            w="240px"
+            flexShrink={0}
+            bg="#F4F6F8"
+            px={6}
+            pt={6}
+            borderRight="1px solid"
+            borderColor="#DDDFE4"
+            overflowY="auto"
+          >
+            <CampaignStepper steps={STEPS} currentStep={currentStep} />
+          </Box>
+
+          {/* Step content */}
+          <Box flex={1} overflowY="auto" px={8} pt={8} bg="white">
+            {currentStep === 0 && (
+              <SelectRecipientsStep
+                search={search}
+                onSearch={setSearch}
+                recipients={filtered}
+              />
+            )}
+            {currentStep === 1 && (
+              <StepPlaceholder title="Compose your message" />
+            )}
+            {currentStep === 2 && (
+              <StepPlaceholder title="Schedule" />
+            )}
+            {currentStep === 3 && (
+              <StepPlaceholder title="Review & send" />
+            )}
+          </Box>
+        </Flex>
       </Flex>
     </Flex>
   );
@@ -220,7 +302,6 @@ function SelectRecipientsStep({
 }: SelectRecipientsStepProps) {
   return (
     <Box>
-      {/* Title */}
       <Text fontSize="20px" fontWeight="semibold" color="#11304F" mb={2}>
         Select the recipients for this message
       </Text>
@@ -228,7 +309,6 @@ function SelectRecipientsStep({
 
       {/* Toolbar */}
       <Flex justify="space-between" align="center" mb={6}>
-        {/* Search */}
         <Box w="358px">
           <SearchInput
             placeholder="Search recipients"
@@ -240,7 +320,6 @@ function SelectRecipientsStep({
         </Box>
 
         <HStack spacing={3}>
-          {/* Action buttons */}
           <Button
             label="New"
             variant="secondary"
@@ -295,31 +374,24 @@ function SelectRecipientsStep({
         </HStack>
       </Flex>
 
-      {/* Recipients Table */}
+      {/* Table */}
       <Table variant="simple" size="md">
         <Thead>
           <Tr borderBottom="1px solid" borderColor="#E6E8EB">
-            <Th
-              fontFamily="sans-serif"
-              fontWeight="bold"
-              color="#6F7489"
-              fontSize="14px"
-              textTransform="none"
-              letterSpacing="normal"
-              pl={0}
-            >
-              Name
-            </Th>
-            <Th
-              fontFamily="sans-serif"
-              fontWeight="bold"
-              color="#6F7489"
-              fontSize="14px"
-              textTransform="none"
-              letterSpacing="normal"
-            >
-              Email
-            </Th>
+            {['Name', 'Email', 'Balance', 'Language'].map((col) => (
+              <Th
+                key={col}
+                fontFamily="sans-serif"
+                fontWeight="bold"
+                color="#6F7489"
+                fontSize="14px"
+                textTransform="none"
+                letterSpacing="normal"
+                pl={col === 'Name' ? 0 : undefined}
+              >
+                {col}
+              </Th>
+            ))}
             <Th
               fontFamily="sans-serif"
               fontWeight="bold"
@@ -332,26 +404,6 @@ function SelectRecipientsStep({
                 <Text>Mobile</Text>
                 <Icon as={Info} fontSize="16px" color="#6F7489" />
               </HStack>
-            </Th>
-            <Th
-              fontFamily="sans-serif"
-              fontWeight="bold"
-              color="#6F7489"
-              fontSize="14px"
-              textTransform="none"
-              letterSpacing="normal"
-            >
-              Balance
-            </Th>
-            <Th
-              fontFamily="sans-serif"
-              fontWeight="bold"
-              color="#6F7489"
-              fontSize="14px"
-              textTransform="none"
-              letterSpacing="normal"
-            >
-              Language
             </Th>
             <Th />
           </Tr>
@@ -367,9 +419,9 @@ function SelectRecipientsStep({
               <Td pl={0} color="#11304F" fontSize="16px" fontWeight="bold">
                 {r.name}
               </Td>
-              <Td color="#11304F" fontSize="16px">
-                {r.email}
-              </Td>
+              <Td color="#11304F" fontSize="16px">{r.email}</Td>
+              <Td color="#11304F" fontSize="16px">{r.balance}</Td>
+              <Td color="#11304F" fontSize="16px">{r.language}</Td>
               <Td>
                 {r.mobileWarning ? (
                   <HStack spacing={1}>
@@ -384,16 +436,8 @@ function SelectRecipientsStep({
                     </Text>
                   </HStack>
                 ) : (
-                  <Text fontSize="16px" color="#11304F">
-                    —
-                  </Text>
+                  <Text fontSize="16px" color="#11304F">—</Text>
                 )}
-              </Td>
-              <Td color="#11304F" fontSize="16px">
-                {r.balance}
-              </Td>
-              <Td color="#11304F" fontSize="16px">
-                {r.language}
               </Td>
               <Td>
                 <Menu
