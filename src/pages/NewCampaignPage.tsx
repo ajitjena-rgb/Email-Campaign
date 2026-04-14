@@ -4,6 +4,7 @@ import {
   Box,
   Flex,
   HStack,
+  VStack,
   Text,
   Table,
   Thead,
@@ -46,6 +47,12 @@ import {
   ReputationManagment,
   Link as LinkIcon,
   Devices,
+  DatePicker,
+  Checkbox,
+  Radio,
+  ChevronUp,
+  ChevronDown,
+  SetTime,
 } from '@radiant/common/ui';
 
 // ─── Nav icons ────────────────────────────────────────────────────────────────
@@ -335,9 +342,7 @@ export function NewCampaignPage() {
               />
             )}
             {currentStep === 1 && <ComposeMessageStep />}
-            {currentStep === 2 && (
-              <StepPlaceholder title="Schedule" />
-            )}
+            {currentStep === 2 && <ScheduleStep />}
             {currentStep === 3 && (
               <StepPlaceholder title="Review & send" />
             )}
@@ -834,6 +839,379 @@ function ComposeMessageStep() {
             },
           }}
         />
+      </Box>
+    </Box>
+  );
+}
+
+// ─── Step 3: Schedule ────────────────────────────────────────────────────────
+
+const TIMEZONE_OPTIONS = [
+  { label: '(GMT-12:00) International Date Line West', value: 'UTC-12' },
+  { label: '(GMT-10:00) Hawaii', value: 'UTC-10' },
+  { label: '(GMT-08:00) Pacific Time (US & Canada)', value: 'UTC-8' },
+  { label: '(GMT-07:00) Mountain Time (US & Canada)', value: 'UTC-7' },
+  { label: '(GMT-06:00) Central Time (US & Canada)', value: 'UTC-6' },
+  { label: '(GMT-05:00) Eastern Time (US & Canada)', value: 'UTC-5' },
+  { label: '(GMT+00:00) UTC', value: 'UTC' },
+  { label: '(GMT+01:00) Amsterdam, Berlin, Rome', value: 'UTC+1' },
+  { label: '(GMT+05:30) Chennai, Kolkata, Mumbai', value: 'UTC+5:30' },
+];
+
+type ScheduleDateRowProps = {
+  date: Date;
+  onDateChange: (d: Date) => void;
+  hour: string;
+  minute: string;
+  ampm: 'AM' | 'PM';
+  onHourChange: (h: string) => void;
+  onMinuteChange: (m: string) => void;
+  onAmPmChange: (v: 'AM' | 'PM') => void;
+  summaryLabel: string;
+  namePrefix: string;
+};
+
+function ScheduleDateRow({
+  date,
+  onDateChange,
+  hour,
+  minute,
+  ampm,
+  onHourChange,
+  onMinuteChange,
+  onAmPmChange,
+  summaryLabel,
+  namePrefix,
+}: ScheduleDateRowProps) {
+  const formattedDate = date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  const increment = () => {
+    let h = parseInt(hour, 10);
+    let m = parseInt(minute, 10) + 1;
+    if (m >= 60) { m = 0; h += 1; }
+    if (h > 12) h = 1;
+    onHourChange(h.toString().padStart(2, '0'));
+    onMinuteChange(m.toString().padStart(2, '0'));
+  };
+
+  const decrement = () => {
+    let h = parseInt(hour, 10);
+    let m = parseInt(minute, 10) - 1;
+    if (m < 0) { m = 59; h -= 1; }
+    if (h < 1) h = 12;
+    onHourChange(h.toString().padStart(2, '0'));
+    onMinuteChange(m.toString().padStart(2, '0'));
+  };
+
+  return (
+    <Flex
+      bg="#EFF4F8"
+      borderRadius="8px"
+      px={4}
+      py={3}
+      align="center"
+      gap={4}
+      flexWrap="wrap"
+    >
+      {/* Date picker */}
+      <Box minW="130px">
+        <DatePicker
+          id={`${namePrefix}-date`}
+          selected={date}
+          onChange={(d: Date) => d && onDateChange(d)}
+          dateFormat="MMM. dd, yyyy"
+        />
+      </Box>
+
+      <Text fontSize="13px" color="#6F7489" whiteSpace="nowrap">
+        starting at
+      </Text>
+
+      {/* Time input with spinners */}
+      <Flex
+        border="1px solid"
+        borderColor="#DDDFE4"
+        borderRadius="6px"
+        bg="white"
+        align="center"
+        overflow="hidden"
+        h="32px"
+      >
+        <CInput
+          w="28px"
+          textAlign="center"
+          fontSize="13px"
+          border="none"
+          px={1}
+          h="100%"
+          value={hour}
+          onChange={(e) =>
+            onHourChange(e.target.value.replace(/\D/g, '').slice(0, 2))
+          }
+          _focus={{ boxShadow: 'none' }}
+        />
+        <Text fontSize="13px" color="#11304F" userSelect="none">
+          :
+        </Text>
+        <CInput
+          w="28px"
+          textAlign="center"
+          fontSize="13px"
+          border="none"
+          px={1}
+          h="100%"
+          value={minute}
+          onChange={(e) =>
+            onMinuteChange(e.target.value.replace(/\D/g, '').slice(0, 2))
+          }
+          _focus={{ boxShadow: 'none' }}
+        />
+        <Flex
+          direction="column"
+          borderLeft="1px solid"
+          borderColor="#DDDFE4"
+          h="100%"
+        >
+          <Box
+            as="button"
+            flex={1}
+            px="4px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            _hover={{ bg: '#F4F6F8' }}
+            onClick={increment}
+            borderBottom="1px solid"
+            borderColor="#DDDFE4"
+            type="button"
+          >
+            <Icon as={ChevronUp} fontSize="9px" color="#6F7489" />
+          </Box>
+          <Box
+            as="button"
+            flex={1}
+            px="4px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            _hover={{ bg: '#F4F6F8' }}
+            onClick={decrement}
+            type="button"
+          >
+            <Icon as={ChevronDown} fontSize="9px" color="#6F7489" />
+          </Box>
+        </Flex>
+      </Flex>
+
+      {/* AM / PM radio */}
+      <VStack spacing={0} align="flex-start">
+        <Radio
+          id={`${namePrefix}-am`}
+          name={`${namePrefix}-ampm`}
+          value="AM"
+          isChecked={ampm === 'AM'}
+          onChange={() => onAmPmChange('AM')}
+          size="sm"
+        >
+          <Text fontSize="12px" color="#11304F">AM</Text>
+        </Radio>
+        <Radio
+          id={`${namePrefix}-pm`}
+          name={`${namePrefix}-ampm`}
+          value="PM"
+          isChecked={ampm === 'PM'}
+          onChange={() => onAmPmChange('PM')}
+          size="sm"
+        >
+          <Text fontSize="12px" color="#11304F">PM</Text>
+        </Radio>
+      </VStack>
+
+      {/* Info */}
+      <Icon as={Info} fontSize="18px" color="red.500" />
+
+      {/* Summary */}
+      <Text fontSize="13px" fontWeight="medium" color="#11304F" flex={1}>
+        {summaryLabel} : {formattedDate} - {hour}:{minute} {ampm}
+      </Text>
+    </Flex>
+  );
+}
+
+function ScheduleStep() {
+  const defaultTimezone =
+    TIMEZONE_OPTIONS.find((o) => o.value === 'UTC-5') ?? TIMEZONE_OPTIONS[0];
+
+  const [timezone, setTimezone] = useState(defaultTimezone);
+  const [allowDebtors, setAllowDebtors] = useState(false);
+
+  const [sendDate, setSendDate] = useState<Date>(new Date('2026-04-14'));
+  const [sendHour, setSendHour] = useState('06');
+  const [sendMinute, setSendMinute] = useState('35');
+  const [sendAmPm, setSendAmPm] = useState<'AM' | 'PM'>('PM');
+
+  const [closeDate, setCloseDate] = useState<Date>(new Date('2026-05-24'));
+  const [closeHour, setCloseHour] = useState('06');
+  const [closeMinute, setCloseMinute] = useState('35');
+  const [closeAmPm, setCloseAmPm] = useState<'AM' | 'PM'>('PM');
+
+  return (
+    <Box pb={8}>
+      <Text fontSize="20px" fontWeight="semibold" color="#11304F" mb={2}>
+        Schedule
+      </Text>
+      <Divider borderColor="#11304F" mb={6} />
+
+      {/* Campaign summary + timezone */}
+      <Flex justify="space-between" align="flex-start" mb={6} gap={4}>
+        <Box>
+          <Text fontSize="16px" fontWeight="bold" color="#48B5B5" mb={3}>
+            New Campaign
+          </Text>
+          <HStack spacing={3}>
+            {/* Email card */}
+            <Flex
+              border="1px dashed"
+              borderColor="#DDDFE4"
+              borderRadius="6px"
+              px={3}
+              py={2}
+              gap={2}
+              align="center"
+              minW="140px"
+            >
+              <Icon as={Email} fontSize="18px" color="#6F7489" />
+              <Box>
+                <Text fontSize="13px" fontWeight="bold" color="#11304F">
+                  Email
+                </Text>
+                <Text fontSize="11px" color="#6F7489">
+                  Single Message
+                </Text>
+              </Box>
+            </Flex>
+
+            {/* Recipients card */}
+            <Flex
+              border="1px dashed"
+              borderColor="#DDDFE4"
+              borderRadius="6px"
+              px={3}
+              py={2}
+              gap={2}
+              align="center"
+              minW="110px"
+            >
+              <Icon as={Users} fontSize="18px" color="#6F7489" />
+              <Box>
+                <Text fontSize="13px" fontWeight="bold" color="#11304F">
+                  Recipients
+                </Text>
+                <Text fontSize="11px" color="#6F7489">
+                  1
+                </Text>
+              </Box>
+            </Flex>
+          </HStack>
+        </Box>
+
+        {/* Timezone selector */}
+        <Box w="300px" flexShrink={0}>
+          <Text fontSize="12px" color="#6F7489" mb={1}>
+            Time Zone (Default)
+          </Text>
+          <DropdownSingle
+            options={TIMEZONE_OPTIONS}
+            selectedOption={timezone}
+            onChangeValue={(val) =>
+              setTimezone(
+                TIMEZONE_OPTIONS.find((o) => o.value === val) ?? timezone
+              )
+            }
+            showDownIcon
+          />
+        </Box>
+      </Flex>
+
+      {/* Section title */}
+      <Flex align="center" gap={3} mb={2} flexWrap="wrap">
+        <Text fontSize="18px" fontWeight="semibold" color="#11304F">
+          Set your send options
+        </Text>
+        <Text fontSize="13px" color="#48B5B5">
+          Define the send details and choose a time to activate your campaign
+        </Text>
+      </Flex>
+      <Divider borderColor="#DDDFE4" mb={5} />
+
+      {/* Checkbox */}
+      <Box mb={6}>
+        <Checkbox
+          id="allow-debtors"
+          name="allow-debtors"
+          isChecked={allowDebtors}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setAllowDebtors(e.target.checked)
+          }
+        >
+          <Text fontSize="14px" color="#11304F">
+            Allow debtors to set payment arrangement start date
+          </Text>
+        </Checkbox>
+      </Box>
+
+      {/* Send date */}
+      <Box mb={5}>
+        <HStack spacing={2} mb={2}>
+          <Icon as={SetTime} fontSize="16px" color="#11304F" />
+          <Text fontSize="14px" fontWeight="semibold" color="#11304F">
+            Schedule a send date
+          </Text>
+        </HStack>
+        <ScheduleDateRow
+          date={sendDate}
+          onDateChange={setSendDate}
+          hour={sendHour}
+          minute={sendMinute}
+          ampm={sendAmPm}
+          onHourChange={setSendHour}
+          onMinuteChange={setSendMinute}
+          onAmPmChange={setSendAmPm}
+          summaryLabel="Campaign will start"
+          namePrefix="send"
+        />
+      </Box>
+
+      {/* Close date */}
+      <Box>
+        <HStack spacing={2} mb={2}>
+          <Icon as={SetTime} fontSize="16px" color="#11304F" />
+          <Text fontSize="14px" fontWeight="semibold" color="#11304F">
+            Schedule a close date
+          </Text>
+          <Icon as={Info} fontSize="14px" color="#6F7489" />
+        </HStack>
+        <ScheduleDateRow
+          date={closeDate}
+          onDateChange={setCloseDate}
+          hour={closeHour}
+          minute={closeMinute}
+          ampm={closeAmPm}
+          onHourChange={setCloseHour}
+          onMinuteChange={setCloseMinute}
+          onAmPmChange={setCloseAmPm}
+          summaryLabel="Campaign will close"
+          namePrefix="close"
+        />
+        <Text fontSize="11px" color="#6F7489" mt={2}>
+          It will no longer be possible to access the links in the emails sent
+          after the date shown here.
+        </Text>
       </Box>
     </Box>
   );
