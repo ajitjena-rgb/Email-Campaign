@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -13,6 +13,8 @@ import {
   Td,
   Divider,
   Icon,
+  Input as CInput,
+  Select,
 } from '@chakra-ui/react';
 import {
   Button,
@@ -20,6 +22,8 @@ import {
   SearchInput,
   Menu,
   MenuItem,
+  Input,
+  DropdownSingle,
   ArrowBack,
   Plus,
   Download,
@@ -40,9 +44,11 @@ import {
   Projects,
   Filter,
   ReputationManagment,
+  Link as LinkIcon,
+  Devices,
 } from '@radiant/common/ui';
 
-// ─── Nav icons (same as EmailCampaignPage) ────────────────────────────────────
+// ─── Nav icons ────────────────────────────────────────────────────────────────
 
 const NAV_ICONS = [
   { icon: Dashboard, label: 'Dashboard' },
@@ -113,9 +119,7 @@ function CampaignStepper({
 
         return (
           <Box key={label}>
-            {/* Step row */}
             <Flex align="center" gap="16px">
-              {/* Number circle */}
               <Flex
                 align="center"
                 justify="center"
@@ -134,8 +138,6 @@ function CampaignStepper({
                   {i + 1}
                 </Text>
               </Flex>
-
-              {/* Label */}
               <Text
                 fontSize="14px"
                 fontWeight="medium"
@@ -146,20 +148,64 @@ function CampaignStepper({
               </Text>
             </Flex>
 
-            {/* Connector line */}
             {!isLast && (
               <Box w="32px" h="18px" overflow="hidden">
-                <Box
-                  ml="15px"
-                  w="1px"
-                  h="32px"
-                  bg="#DDDFE4"
-                />
+                <Box ml="15px" w="1px" h="32px" bg="#DDDFE4" />
               </Box>
             )}
           </Box>
         );
       })}
+    </Box>
+  );
+}
+
+// ─── Toolbar helpers ──────────────────────────────────────────────────────────
+
+function ToolbarBtn({ label, title }: { label: string; title: string }) {
+  return (
+    <Box
+      as="button"
+      title={title}
+      px="6px"
+      py="1px"
+      borderRadius="2px"
+      fontSize="13px"
+      fontWeight="bold"
+      color="#11304F"
+      lineHeight="18px"
+      _hover={{ bg: '#F4F6F8' }}
+      cursor="pointer"
+      bg="transparent"
+      border="none"
+    >
+      {label}
+    </Box>
+  );
+}
+
+function ToolbarIcon({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Box
+      as="button"
+      title={title}
+      p="3px"
+      borderRadius="2px"
+      color="#11304F"
+      _hover={{ bg: '#F4F6F8' }}
+      cursor="pointer"
+      bg="transparent"
+      border="none"
+      display="flex"
+      alignItems="center"
+    >
+      {children}
     </Box>
   );
 }
@@ -178,9 +224,13 @@ export function NewCampaignPage() {
     if (currentStep < STEPS.length - 1) setCurrentStep((s) => s + 1);
   };
 
+  const handlePrev = () => {
+    if (currentStep > 0) setCurrentStep((s) => s - 1);
+  };
+
   return (
     <Flex h="100vh" overflow="hidden">
-      {/* ── Left Sidebar Nav (same as campaign list) ── */}
+      {/* ── Left Sidebar Nav ── */}
       <Flex
         as="nav"
         direction="column"
@@ -192,10 +242,10 @@ export function NewCampaignPage() {
         flexShrink={0}
         overflowY="auto"
       >
-        {NAV_ICONS.map(({ icon, label }) => (
+        {NAV_ICONS.map(({ icon: NavIcon, label }) => (
           <IconButton
             key={label}
-            icon={icon}
+            icon={<NavIcon />}
             variant="action-dark"
             aria-label={label}
             size="md"
@@ -206,7 +256,7 @@ export function NewCampaignPage() {
       {/* ── Main Area ── */}
       <Flex direction="column" flex={1} overflow="hidden">
 
-        {/* ── Top Header: back + title + Next ── */}
+        {/* ── Header ── */}
         <Flex
           align="center"
           justify="space-between"
@@ -218,37 +268,50 @@ export function NewCampaignPage() {
           flexShrink={0}
         >
           <HStack spacing={3}>
-            <Link to="/" style={{ textDecoration: 'none' }}>
+            <RouterLink to="/" style={{ textDecoration: 'none' }}>
               <IconButton
-                icon={ArrowBack}
+                icon={<ArrowBack />}
                 variant="minimal"
                 aria-label="Go back"
                 size="sm"
+                color="#11304F"
               />
-            </Link>
+            </RouterLink>
             <Text fontWeight="bold" fontSize="18px" color="#11304F">
               Create New Campaign
             </Text>
           </HStack>
 
-          <Button
-            label="Next"
-            variant="primary"
-            size="md"
-            borderRadius="16px"
-            bg="#48B5B5"
-            _hover={{ bg: '#3DA3A3' }}
-            color="white"
-            minW="100px"
-            onClick={handleNext}
-            disabled={currentStep === STEPS.length - 1}
-          />
+          <HStack spacing={3}>
+            {currentStep > 0 && (
+              <Button
+                label="Previous"
+                variant="secondary"
+                size="md"
+                borderRadius="16px"
+                minW="100px"
+                onClick={handlePrev}
+              />
+            )}
+            <Button
+              label="Next"
+              variant="primary"
+              size="md"
+              borderRadius="16px"
+              bg="#48B5B5"
+              _hover={{ bg: '#3DA3A3' }}
+              color="white"
+              minW="100px"
+              onClick={handleNext}
+              disabled={currentStep === STEPS.length - 1}
+            />
+          </HStack>
         </Flex>
 
         {/* ── Body: stepper sidebar + content ── */}
         <Flex flex={1} overflow="hidden">
 
-          {/* Custom stepper sidebar */}
+          {/* Stepper sidebar */}
           <Box
             w="240px"
             flexShrink={0}
@@ -271,9 +334,7 @@ export function NewCampaignPage() {
                 recipients={filtered}
               />
             )}
-            {currentStep === 1 && (
-              <StepPlaceholder title="Compose your message" />
-            )}
+            {currentStep === 1 && <ComposeMessageStep />}
             {currentStep === 2 && (
               <StepPlaceholder title="Schedule" />
             )}
@@ -443,7 +504,7 @@ function SelectRecipientsStep({
                 <Menu
                   menuButton={
                     <IconButton
-                      icon={More}
+                      icon={<More />}
                       variant="minimal"
                       aria-label="More options"
                       size="sm"
@@ -458,6 +519,322 @@ function SelectRecipientsStep({
           ))}
         </Tbody>
       </Table>
+    </Box>
+  );
+}
+
+// ─── Step 2: Compose Message ──────────────────────────────────────────────────
+
+const TEMPLATE_OPTIONS = [
+  { label: 'Welcome email', value: 'welcome' },
+  { label: 'Payment reminder', value: 'payment-reminder' },
+  { label: 'Follow-up', value: 'follow-up' },
+];
+
+function ComposeMessageStep() {
+  const [campaignName, setCampaignName] = useState('');
+  const [subject, setSubject] = useState('');
+  const [selectedTemplate, setSelectedTemplate] = useState<{
+    label: string;
+    value: string;
+  } | null>(null);
+
+  return (
+    <Box pb={8}>
+      <Text fontSize="20px" fontWeight="semibold" color="#11304F" mb={2}>
+        Compose your message
+      </Text>
+      <Divider borderColor="#11304F" mb={6} />
+
+      {/* Campaign Name */}
+      <Box mb={6}>
+        <Text fontSize="16px" fontWeight="semibold" color="#11304F" mb={3}>
+          Campaign Name
+        </Text>
+        <Input
+          label="e.g. 30 days sequence with Text message"
+          value={campaignName}
+          onChange={(e) => setCampaignName(e.target.value)}
+        />
+        <Text fontSize="12px" color="#6F7489" mt={1}>
+          For internal reference only. This won't be visible to your recipient(s).
+        </Text>
+      </Box>
+
+      {/* Section title + info */}
+      <Flex justify="space-between" align="flex-start" mb={4} gap={4}>
+        <Text fontSize="16px" fontWeight="semibold" color="#11304F" flexShrink={0}>
+          Compose your message
+        </Text>
+        <HStack spacing={1} align="flex-start">
+          <Text fontSize="12px" color="#48B5B5" textAlign="right">
+            Choose between a one-time Email or Text message or set a campaign
+            using a Sequence with multiple steps.
+          </Text>
+          <Icon as={Info} fontSize="14px" color="#48B5B5" mt="1px" flexShrink={0} />
+        </HStack>
+      </Flex>
+
+      {/* Template + Subject card */}
+      <Box border="2px solid" borderColor="#E8A838" borderRadius="8px" p={4}>
+        {/* Template row */}
+        <Flex align="center" gap={3} mb={1}>
+          <Box flex={1}>
+            <DropdownSingle
+              label="Select an email template"
+              options={TEMPLATE_OPTIONS}
+              selectedOption={selectedTemplate}
+              onChangeValue={(val) => {
+                setSelectedTemplate(
+                  TEMPLATE_OPTIONS.find((o) => o.value === val) ?? null
+                );
+              }}
+              showDownIcon
+            />
+          </Box>
+          <Icon as={Info} fontSize="16px" color="#6F7489" />
+          <Flex
+            bg="#4A3F8F"
+            borderRadius="4px"
+            px={2}
+            h="24px"
+            align="center"
+            justify="center"
+          >
+            <Text fontSize="11px" color="white" fontWeight="bold" lineHeight="1">
+              EN
+            </Text>
+          </Flex>
+        </Flex>
+        <Text fontSize="12px" color="#6F7489" mb={4}>
+          Optional
+        </Text>
+
+        <Divider borderColor="#DDDFE4" mb={4} />
+
+        {/* Subject */}
+        <HStack spacing={3}>
+          <Text
+            fontSize="14px"
+            fontWeight="bold"
+            color="#11304F"
+            whiteSpace="nowrap"
+          >
+            *Subject:
+          </Text>
+          <CInput
+            variant="flushed"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            borderColor="#DDDFE4"
+            _focus={{ borderColor: '#48B5B5', boxShadow: 'none' }}
+            fontSize="14px"
+            color="#11304F"
+            flex={1}
+          />
+        </HStack>
+      </Box>
+
+      {/* Dashed connector */}
+      <Flex justify="center">
+        <Box
+          w="0"
+          h="24px"
+          borderLeft="2px dashed"
+          borderColor="#E8A838"
+        />
+      </Flex>
+
+      {/* Message composer card */}
+      <Box border="2px solid" borderColor="#E8A838" borderRadius="8px" p={4}>
+        {/* Insert tags */}
+        <HStack spacing={2} mb={3}>
+          <Text fontSize="14px" fontWeight="bold" color="#11304F">
+            Insert tags:
+          </Text>
+          <Text fontSize="14px" color="#6F7489">
+            Type "@" to add tags into your message.
+          </Text>
+          <Icon as={Info} fontSize="14px" color="#6F7489" />
+        </HStack>
+
+        {/* Tag chip area */}
+        <Box bg="#DDE3EA" borderRadius="4px" h="36px" mb={4} />
+
+        {/* Compose label */}
+        <Text fontSize="14px" fontWeight="medium" color="#11304F" mb={2}>
+          Compose your message:
+        </Text>
+
+        {/* Toolbar */}
+        <Flex
+          border="1px solid"
+          borderColor="#DDDFE4"
+          borderRadius="4px 4px 0 0"
+          px={2}
+          py="6px"
+          gap={1}
+          align="center"
+          flexWrap="wrap"
+        >
+          {/* Font family */}
+          <Select
+            size="xs"
+            w="80px"
+            fontSize="12px"
+            border="none"
+            _focus={{ boxShadow: 'none' }}
+            color="#11304F"
+          >
+            <option>Arial</option>
+            <option>Times New Roman</option>
+            <option>Georgia</option>
+          </Select>
+
+          {/* Font size */}
+          <Select
+            size="xs"
+            w="58px"
+            fontSize="12px"
+            border="none"
+            _focus={{ boxShadow: 'none' }}
+            color="#11304F"
+            defaultValue="11pt"
+          >
+            <option>8pt</option>
+            <option>10pt</option>
+            <option>11pt</option>
+            <option>12pt</option>
+            <option>14pt</option>
+            <option>18pt</option>
+          </Select>
+
+          <Box w="1px" h="16px" bg="#DDDFE4" mx={1} />
+
+          {/* B I U */}
+          <ToolbarBtn label="B" title="Bold" />
+          <ToolbarBtn label="I" title="Italic" />
+          <ToolbarBtn label="U" title="Underline" />
+
+          {/* Text color */}
+          <Box
+            as="button"
+            title="Text Color"
+            px="6px"
+            py="1px"
+            borderRadius="2px"
+            fontSize="13px"
+            fontWeight="bold"
+            color="#11304F"
+            lineHeight="18px"
+            _hover={{ bg: '#F4F6F8' }}
+            cursor="pointer"
+            bg="transparent"
+            border="none"
+            position="relative"
+          >
+            <Text as="span" borderBottom="2px solid" borderColor="red.500">
+              A
+            </Text>
+            <Text as="span" fontSize="10px" ml="1px">▾</Text>
+          </Box>
+
+          <Box w="1px" h="16px" bg="#DDDFE4" mx={1} />
+
+          {/* Ordered list */}
+          <ToolbarIcon title="Ordered List">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M2 3h1v3H2V3zm0 4.5h1v1H2v-1zm0 3h1v1H2v-1zM1 12.5h1.5V13H1v.5h1.5V14H1v.5h1.5v-2H1v.5zM1 11h.5v.5H1V12h1V10H1v1zm1-6.5H1.5V5H1v.5h.5V6H2V5h.5v-.5H2V4.5zM5 4h9v1H5V4zm0 4h9v1H5V8zm0 4h9v1H5v-1z"/>
+            </svg>
+          </ToolbarIcon>
+
+          {/* Unordered list */}
+          <ToolbarIcon title="Unordered List">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <circle cx="3" cy="4.5" r="1"/>
+              <circle cx="3" cy="8.5" r="1"/>
+              <circle cx="3" cy="12.5" r="1"/>
+              <path d="M6 4h9v1H6V4zm0 4h9v1H6V8zm0 4h9v1H6v-1z"/>
+            </svg>
+          </ToolbarIcon>
+
+          <Box w="1px" h="16px" bg="#DDDFE4" mx={1} />
+
+          {/* Align left */}
+          <ToolbarIcon title="Align Left">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M2 4h12v1H2V4zm0 3h8v1H2V7zm0 3h12v1H2v-1zm0 3h8v1H2v-1z"/>
+            </svg>
+          </ToolbarIcon>
+
+          {/* Align center */}
+          <ToolbarIcon title="Align Center">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M2 4h12v1H2V4zm2 3h8v1H4V7zm-2 3h12v1H2v-1zm2 3h8v1H4v-1z"/>
+            </svg>
+          </ToolbarIcon>
+
+          {/* Align right */}
+          <ToolbarIcon title="Align Right">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M2 4h12v1H2V4zm4 3h8v1H6V7zm-4 3h12v1H2v-1zm4 3h8v1H6v-1z"/>
+            </svg>
+          </ToolbarIcon>
+
+          <Box w="1px" h="16px" bg="#DDDFE4" mx={1} />
+
+          {/* Insert image */}
+          <ToolbarIcon title="Insert Image">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2">
+              <rect x="2" y="3" width="12" height="10" rx="1"/>
+              <circle cx="5.5" cy="6.5" r="1"/>
+              <path d="M2 11l3.5-3.5 2.5 2.5 2-2L14 11"/>
+            </svg>
+          </ToolbarIcon>
+
+          {/* Insert link */}
+          <ToolbarIcon title="Insert Link">
+            <Icon as={LinkIcon} fontSize="15px" />
+          </ToolbarIcon>
+
+          <Box w="1px" h="16px" bg="#DDDFE4" mx={1} />
+
+          {/* Desktop preview */}
+          <ToolbarIcon title="Desktop Preview">
+            <Icon as={Devices} fontSize="16px" />
+          </ToolbarIcon>
+
+          {/* Mobile preview */}
+          <ToolbarIcon title="Mobile Preview">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2">
+              <rect x="4.5" y="1.5" width="7" height="13" rx="1.5"/>
+              <circle cx="8" cy="12.5" r="0.6" fill="currentColor" stroke="none"/>
+            </svg>
+          </ToolbarIcon>
+        </Flex>
+
+        {/* Editor content area */}
+        <Box
+          as="div"
+          contentEditable
+          suppressContentEditableWarning
+          border="1px solid"
+          borderTop="none"
+          borderColor="#DDDFE4"
+          borderRadius="0 0 4px 4px"
+          minH="200px"
+          p={3}
+          fontSize="14px"
+          color="#11304F"
+          sx={{
+            '&:focus': { outline: 'none' },
+            '&:empty:before': {
+              content: '"Start typing your message..."',
+              color: '#9AA0B4',
+            },
+          }}
+        />
+      </Box>
     </Box>
   );
 }
