@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -68,7 +68,6 @@ const MOCK_RECIPIENTS: Recipient[] = [
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function NewCampaignPage() {
-  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [search, setSearch] = useState('');
 
@@ -114,13 +113,14 @@ export function NewCampaignPage() {
       >
         {/* Left: back icon + campaign icon + breadcrumb */}
         <HStack spacing={3}>
-          <IconButton
-            icon={ArrowBack}
-            variant="minimal"
-            aria-label="Go back"
-            size="sm"
-            onClick={() => navigate('/')}
-          />
+          <Link to="/" style={{ textDecoration: 'none' }}>
+            <IconButton
+              icon={ArrowBack}
+              variant="minimal"
+              aria-label="Go back"
+              size="sm"
+            />
+          </Link>
           <Icon as={SMSCampaign} fontSize="22px" color="#11304F" />
           <Text fontWeight="bold" fontSize="18px" color="#11304F">
             Campaigns
@@ -129,15 +129,16 @@ export function NewCampaignPage() {
           {/* Breadcrumb */}
           <HStack spacing={2}>
             <Icon as={ChevronRight} fontSize="16px" color="#6F7489" />
-            <Text
-              fontSize="14px"
-              color="#6F7489"
-              cursor="pointer"
-              onClick={() => navigate('/')}
-              _hover={{ color: '#11304F' }}
-            >
-              Index
-            </Text>
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <Text
+                fontSize="14px"
+                color="#6F7489"
+                cursor="pointer"
+                _hover={{ color: '#11304F' }}
+              >
+                Index
+              </Text>
+            </Link>
             <Icon as={ChevronRight} fontSize="16px" color="#6F7489" />
             <Text fontSize="14px" color="#11304F" fontWeight="medium">
               New Campaign

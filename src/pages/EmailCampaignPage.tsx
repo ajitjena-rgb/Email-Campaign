@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -102,7 +102,6 @@ const STATUS_BADGE_VARIANT: Record<Campaign['status'], 'blue' | 'neutral' | 'gre
 };
 
 export function EmailCampaignPage() {
-  const navigate = useNavigate();
   const [tabIndex, setTabIndex] = useState(0);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -425,18 +424,19 @@ export function EmailCampaignPage() {
                   border="none"
                   color="#11304F"
                 />
-                <Button
-                  label="New Campaign"
-                  variant="primary"
-                  icon={Plus}
-                  iconPos="left"
-                  size="md"
-                  borderRadius="16px"
-                  bg="#48B5B5"
-                  _hover={{ bg: '#3DA3A3' }}
-                  color="white"
-                  onClick={() => navigate('/new-campaign')}
-                />
+                <Link to="/new-campaign" style={{ textDecoration: 'none' }}>
+                  <Button
+                    label="New Campaign"
+                    variant="primary"
+                    icon={Plus}
+                    iconPos="left"
+                    size="md"
+                    borderRadius="16px"
+                    bg="#48B5B5"
+                    _hover={{ bg: '#3DA3A3' }}
+                    color="white"
+                  />
+                </Link>
               </HStack>
             </Flex>
 
