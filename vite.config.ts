@@ -17,10 +17,13 @@ export default defineConfig({
       { find: '@radiant/common/theme', replacement: resolve(radiantRoot, 'libs/common/theme/src/index.ts') },
       { find: '@radiant/common/ui', replacement: resolve(radiantRoot, 'libs/common/ui/src/index.ts') },
       { find: '@radiant/common/utils', replacement: resolve(__dirname, 'src/shims/radiant-common-utils.ts') },
-      // Resolve all shared deps from our node_modules so external sources can find them
+
+      // react: exact regex for bare 'react'; explicit aliases for sub-paths
+      { find: /^react$/, replacement: nm('react') },
       { find: 'react/jsx-runtime', replacement: nm('react/jsx-runtime') },
-      { find: 'react', replacement: nm('react') },
-      { find: 'react-dom', replacement: nm('react-dom') },
+      { find: 'react/jsx-dev-runtime', replacement: nm('react/jsx-dev-runtime') },
+
+      // chakra + emotion + other radiant deps — explicit per-package (string = prefix match in rolldown)
       { find: '@chakra-ui/avatar', replacement: nm('@chakra-ui/avatar') },
       { find: '@chakra-ui/layout', replacement: nm('@chakra-ui/layout') },
       { find: '@chakra-ui/provider', replacement: nm('@chakra-ui/provider') },
