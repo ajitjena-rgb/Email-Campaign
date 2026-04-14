@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -101,6 +102,7 @@ const STATUS_BADGE_VARIANT: Record<Campaign['status'], 'blue' | 'neutral' | 'gre
 };
 
 export function EmailCampaignPage() {
+  const navigate = useNavigate();
   const [tabIndex, setTabIndex] = useState(0);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -433,6 +435,7 @@ export function EmailCampaignPage() {
                   bg="#48B5B5"
                   _hover={{ bg: '#3DA3A3' }}
                   color="white"
+                  onClick={() => navigate('/new-campaign')}
                 />
               </HStack>
             </Flex>
