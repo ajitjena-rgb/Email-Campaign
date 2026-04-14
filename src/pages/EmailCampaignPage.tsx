@@ -117,7 +117,7 @@ export function EmailCampaignPage() {
     {
       label: 'Campaign',
       view: (
-        <VStack align="stretch" spacing={6} pt={4}>
+        <VStack align="stretch" spacing={6} px={{ base: 3, md: 6 }} pt={4}>
           {/* Filters */}
           <Flex
             justify="space-between"
@@ -135,15 +135,18 @@ export function EmailCampaignPage() {
               />
             </Box>
             <HStack spacing={3} flexWrap="wrap">
-              <Box w="118px">
+              <Box w="118px" flexShrink={0}>
                 <DropdownSingle
                   options={STATUS_FILTER_OPTIONS}
                   selectedOption={
                     STATUS_FILTER_OPTIONS.find((o) => o.value === statusFilter) ??
                     null
                   }
-                  onChangeValue={(val) => setStatusFilter(val)}
+                  onChangeSelectedOption={(option) =>
+                    setStatusFilter(option?.value ?? 'all')
+                  }
                   showDownIcon
+                  minW="0"
                 />
               </Box>
               <Button
@@ -468,6 +471,10 @@ export function EmailCampaignPage() {
               selectedTabIndex={tabIndex}
               onChangeTabIndex={setTabIndex}
               children={null}
+              sx={{
+                '& .chakra-tabs__tablist': { px: { base: 3, md: 6 } },
+                '& .chakra-tabs__tab-panel': { px: 0, pt: 0, pb: 0 },
+              }}
             />
           </Box>
         </Box>
